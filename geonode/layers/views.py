@@ -361,6 +361,7 @@ def layer_detail(request, layername, template='layers/layer_detail.html'):
         "name": layer.alternate,
         "title": layer.title,
         "queryable": True,
+        "storeType": layer.storeType,
         "bbox": {
             layer.srid: {
                 "srs": layer.srid,
@@ -1118,10 +1119,11 @@ def layer_metadata(
         try:
             all_metadata_author_groups = chain(
                 request.user.group_list_all().distinct(),
-                GroupProfile.objects.exclude(access="private"))
+                GroupProfile.objects.exclude(
+                    access="private").exclude(access="public-invite"))
         except BaseException:
             all_metadata_author_groups = GroupProfile.objects.exclude(
-                access="private")
+                access="private").exclude(access="public-invite")
         [metadata_author_groups.append(item) for item in all_metadata_author_groups
             if item not in metadata_author_groups]
 
